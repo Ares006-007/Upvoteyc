@@ -20,50 +20,83 @@ async def slack_command(
     text: str = Form(default=""),
     response_url: str = Form(default="")
 ):
-    # Parse input: /upvotevc r/startups agriculture
-    parts = text.strip().split()
+    from agents.idea_refiner import extract_search_queries, refine_idea
+
+    raw_text = text.strip()
+    is_idea_research = raw_text.lower().startswith("idea:")
     
+    user_idea = None
     subreddit = "bangalore"  # default
     keyword = None
     
-    for part in parts:
-        if part.startswith("r/"):
-            subreddit = part[2:]  # strip r/
-        elif part.startswith("/"):
-            subreddit = part[1:]  # strip leading /
-        else:
-            keyword = part
-    
-    # Confirm immediately to Slack (must respond in 3 seconds)
-    confirm_msg = f"Got it! Searching *r/{subreddit}*"
-    if keyword:
-        confirm_msg += f" for *{keyword}*"
+    if is_idea_research:
+        user_idea = raw_text[5:].strip()
+        confirm_msg = f"Got it! Researching your idea: *\"{user_idea}\"*"
+    else:
+        parts = raw_text.split()
+        for part in parts:
+            if part.startswith("r/"):
+                subreddit = part[2:]  # strip r/
+            elif part.startswith("/"):
+                subreddit = part[1:]  # strip leading /
+            else:
+                keyword = part
+                
+        confirm_msg = f"Got it! Searching *r/{subreddit}*"
+        if keyword:
+            confirm_msg += f" for *{keyword}*"
+            
     confirm_msg += "\nRunning 7 agents... Results in ~2 minutes 🤖"
     
     # Run pipeline in background thread
     def run_and_send():
         try:
+            nonlocal subreddit, keyword
+            
+            # Extract search queries if it's a custom idea
+            if is_idea_research:
+                queries = extract_search_queries(user_idea)
+                subreddit = queries.get("topic", "bangalore")
+                keyword = queries.get("keyword")
+                
             all_data    = aggregate(subreddit, keyword=keyword)
             posts       = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
             
+            # Retry broad search if no signals found
+            if not posts and keyword:
+                print("[Main] No signals found, retrying broad search...")
+                all_data = aggregate(subreddit, keyword=None)
+                posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
+                
             if not posts:
                 requests.post(response_url, json={
-                    "text": f"❌ No signals found for '{subreddit}' / '{keyword or 'None'}'. Try a different topic or keyword."
+                    "text": f"❌ No signals found for topic '{subreddit}' / '{keyword or 'None'}'. Try describing your idea differently."
                 })
                 return
             
             pain        = find_pain(posts)
             analysis    = analyze(pain, all_data)
-            ideas       = generate_ideas(pain, analysis)
-            val_results = [validate(idea, pain) for idea in ideas]
-            pitch       = write_pitch(pain, analysis, ideas, val_results, posts)
-            remember(pain, analysis, ideas)
             
-            # Add header to pitch
-            full = f"🔍 *r/{subreddit}*"
-            if keyword:
-                full += f" · *{keyword}*"
-            full += "\n\n" + pitch
+            if is_idea_research:
+                # Refine and validate the user's custom idea
+                refined = refine_idea(user_idea, pain, analysis)
+                val_result = validate(refined, pain)
+                pitch = write_pitch(pain, analysis, [refined], [val_result], posts)
+                remember(pain, analysis, [refined])
+                
+                full = f"🔍 *Custom Idea Research: \"{user_idea}\"*\n"
+                full += f"Topic: *{subreddit}* · Keyword: *{keyword}*\n\n" + pitch
+            else:
+                # Standard flow: generate new ideas
+                ideas       = generate_ideas(pain, analysis)
+                val_results = [validate(idea, pain) for idea in ideas]
+                pitch       = write_pitch(pain, analysis, ideas, val_results, posts)
+                remember(pain, analysis, ideas)
+                
+                full = f"🔍 *r/{subreddit}*"
+                if keyword:
+                    full += f" · *{keyword}*"
+                full += "\n\n" + pitch
             
             # Split if too long
             MAX = 3000
@@ -73,7 +106,7 @@ async def slack_command(
                 
         except Exception as e:
             requests.post(response_url, json={"text": f"❌ Error: {str(e)}"})
-    
+            
     thread = threading.Thread(target=run_and_send)
     thread.start()
     
