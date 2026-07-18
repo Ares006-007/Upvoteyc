@@ -4,7 +4,7 @@ def write_pitch(pain: dict, analysis: dict, ideas: list, val_results: list, post
     top_url = posts[0]["url"] if posts else ""
     
     pitch = f"""
-🔴 *PAIN POINT — r/bangalore + News + Trends*
+🔴 *PAIN POINT ANALYSIS*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 *{pain.get('pain_point')}*
 📊 Severity: *{analysis.get('severity_score', '?')}/10*

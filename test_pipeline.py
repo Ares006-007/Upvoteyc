@@ -8,7 +8,7 @@ from agents.memory import remember
 
 print("🚀 Starting UpvoteVC pipeline...\n")
 
-all_data = aggregate("education", keyword="Neet Scam")
+all_data = aggregate("Data centers", keyword="AI")
 posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
 
 if not posts:

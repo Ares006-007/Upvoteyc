@@ -44,11 +44,11 @@ async def slack_command(
     def run_and_send():
         try:
             all_data    = aggregate(subreddit, keyword=keyword)
-            posts       = all_data.get("reddit", [])
+            posts       = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
             
             if not posts:
                 requests.post(response_url, json={
-                    "text": f"❌ No complaint posts found in r/{subreddit}. Try a different subreddit or keyword."
+                    "text": f"❌ No signals found for '{subreddit}' / '{keyword or 'None'}'. Try a different topic or keyword."
                 })
                 return
             
