@@ -1,0 +1,7 @@
+venv/
+.env
+.env.local
+__pycache__/
+*.pyc
+memory.json
+scratch/
