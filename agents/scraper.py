@@ -25,7 +25,8 @@ def scrape(subreddit="bangalore", keyword=None, limit=100) -> list:
                     "comments": 10,
                     "url": p.get("link", ""),
                     "preview": clean_desc,
-                    "timeframe": "recent"
+                    "timeframe": "recent",
+                    "source_type": "reddit"
                 })
         else:
             print(f"[Scraper] Warning: rss2json status code {r.status_code}")

@@ -8,8 +8,8 @@ from agents.memory import remember
 
 print("🚀 Starting UpvoteVC pipeline...\n")
 
-all_data = aggregate("bangalore", keyword=None)
-posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("trends", [])
+all_data = aggregate("education", keyword="Neet Scam")
+posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
 
 if not posts:
     print("❌ No posts found. Try a different city or keyword.")

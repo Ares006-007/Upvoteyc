@@ -35,7 +35,8 @@ def scrape_news(topic="bangalore problems") -> list:
                 "title": art.get("title", ""),
                 "source": art.get("source", {}).get("name", "newsapi"),
                 "score": 50,  # neutral score
-                "url": art.get("url", "")
+                "url": art.get("url", ""),
+                "source_type": "newsapi"
             })
             
         print(f"[News] Found {len(items)} articles")
