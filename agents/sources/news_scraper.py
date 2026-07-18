@@ -1,38 +1,46 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-HEADERS = {"User-Agent": "UpvoteVC/1.0"}
+load_dotenv()
+
+NEWS_API_KEY = os.environ.get("NEWS_API_KEY", "")
 
 def scrape_news(topic="bangalore problems") -> list:
     print(f"[News] Fetching news for: {topic}...")
     
-    # Using Google News RSS - completely free, no key
-    url = f"https://news.google.com/rss/search?q={topic.replace(' ', '+')}&hl=en-IN&gl=IN&ceid=IN:en"
+    if not NEWS_API_KEY:
+        print("[News] Error: NEWS_API_KEY is not configured.")
+        return []
+        
+    url = "https://newsapi.org/v2/everything"
+    params = {
+        "q": topic,
+        "apiKey": NEWS_API_KEY,
+        "pageSize": 10
+    }
     
     try:
-        r = requests.get(url, headers=HEADERS, timeout=10)
+        r = requests.get(url, params=params, timeout=10)
+        if r.status_code != 200:
+            print(f"[News] Failed: Status code {r.status_code}")
+            return []
+            
+        data = r.json()
+        articles = data.get("articles", [])
         
-        # Parse RSS manually - no extra library needed
         items = []
-        content = r.text
-        
-        # Extract titles and links
-        import re
-        titles = re.findall(r'<title>(.*?)</title>', content)[2:]  # skip feed title
-        links = re.findall(r'<link>(.*?)</link>', content)
-        
-        for i, title in enumerate(titles[:10]):
-            # Clean HTML entities
-            title = title.replace('&amp;', '&').replace('&quot;', '"')
+        for art in articles:
             items.append({
-                "title": title,
-                "source": "google_news",
+                "title": art.get("title", ""),
+                "source": art.get("source", {}).get("name", "newsapi"),
                 "score": 50,  # neutral score
-                "url": links[i] if i < len(links) else ""
+                "url": art.get("url", "")
             })
-        
+            
         print(f"[News] Found {len(items)} articles")
         return items
-    
+        
     except Exception as e:
         print(f"[News] Failed: {e}")
         return []
