@@ -1,16 +1,27 @@
-from core.llm import llm_json
+from core.llm import structured_llm
+from core.schema import ValidatedResearch
 
-def validate(idea: dict, pain: dict) -> dict:
-    print("[Validator] Checking market...")
+def run_validator(query: str, worker_outputs: dict) -> ValidatedResearch:
+    """
+    Validates all worker outputs against each other, detecting contradictions and unsupported claims.
+    """
+    print(f"[Validator] Merging and validating all worker outputs...")
     
-    result = llm_json(
-        system="You are a startup analyst. Be concise and honest.",
-        prompt=f"""Startup: {idea.get('name')} — {idea.get('tagline')}
-Solving: {pain.get('pain_point')} in Bangalore
+    system = """You are the Validator Agent. You receive outputs from multiple research workers (Pain, Competitor, Customer, Market, etc.).
+Your job is to:
+1. Detect contradictions (e.g., one worker says it's a huge market, another says it's niche).
+2. Check if claims have strong evidence. If they don't, mark them as 'unsupported_claims' (hypotheses).
+3. Merge the strongest evidence into a de-duplicated list.
+4. Give a final 'GO' or 'NO-GO' verdict and an overall confidence score.
 
-Return ONLY this JSON:
-{{"market_size": "estimate with numbers", "competitors": ["Competitor: gap they leave", "Competitor2: gap"], "our_edge": "why this wins", "verdict": "GO"}}"""
-    )
+DO NOT do new research. Only evaluate what the workers provided.
+"""
+
+    prompt = f"""User Idea / Query: {query}
     
-    print(f"[Validator] Verdict: {result.get('verdict', '?')}")
-    return result
+Worker Outputs:
+{worker_outputs}
+
+Evaluate the data and output the ValidatedResearch JSON."""
+
+    return structured_llm(prompt, system, ValidatedResearch)

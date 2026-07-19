@@ -1,15 +1,13 @@
-import json, os
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # Works locally (hardcoded) AND on Railway (env var)
-API_KEY = os.environ.get(
-    "HACKCLUB_API_KEY",
-    ""
-)
+API_KEY = os.environ.get("HACKCLUB_API_KEY", "")
 
 from openai import OpenAI
+from core.retry import with_retry
 
 client = OpenAI(
     base_url="https://ai.hackclub.com/proxy/v1",
@@ -19,6 +17,7 @@ client = OpenAI(
 MODEL = "qwen/qwen3-32b"
 
 def llm(prompt: str, system: str = "") -> str:
+    """Basic text-to-text LLM call."""
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
@@ -37,23 +36,9 @@ def llm(prompt: str, system: str = "") -> str:
         print(f"[LLM API Error] {e}")
         return ""
 
-def llm_json(prompt: str, system: str = "") -> dict:
-    raw = llm(prompt, system)
-    if not raw:
-        return {}
-    try:
-        clean = raw.strip()
-        if "```" in clean:
-            clean = clean.split("```")[1]
-            if clean.startswith("json"):
-                clean = clean[4:]
-        
-        # Try to fix truncated JSON by appending closing braces if missing
-        if not clean.strip().endswith("}"):
-            clean += "\n}"
-            
-        return json.loads(clean.strip())
-    except Exception as e:
-        print(f"[LLM] JSON parse failed: {e}")
-        print(f"[LLM] Raw: {raw[:200]}")
-        return {}
+def structured_llm(prompt: str, system: str, response_model):
+    """
+    Calls the LLM and enforces the Pydantic response_model schema,
+    using an automatic retry loop for JSON repair.
+    """
+    return with_retry(llm, prompt, system, response_model)

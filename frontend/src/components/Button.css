@@ -1,0 +1,59 @@
+.btn {
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  transition: transform 0.1s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--rounded-pill);
+  padding: 10px 20px;
+}
+
+.btn-secondary {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  border-radius: var(--rounded-pill);
+  padding: 8px 18px 10px; /* Asymmetric vertical to optically center the type */
+}
+
+.btn-tertiary {
+  background-color: transparent;
+  color: var(--color-ink);
+  border-radius: var(--rounded-full);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.btn-icon {
+  background-color: var(--color-surface-soft);
+  color: var(--color-ink);
+  border-radius: var(--rounded-full);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.btn-icon-inverse {
+  background-color: var(--color-on-inverse-soft);
+  color: var(--color-inverse-ink);
+  border-radius: var(--rounded-full);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.btn-magenta-promo {
+  background-color: var(--color-accent-magenta);
+  color: var(--color-on-primary);
+  border-radius: var(--rounded-pill);
+  padding: 10px 18px;
+}

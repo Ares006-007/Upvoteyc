@@ -1,26 +1,30 @@
-from agents.aggregator import aggregate
-from agents.pain_finder import find_pain
-from agents.analyzer import analyze
-from agents.idea_gen import generate_ideas
-from agents.validator import validate
-from agents.pitcher import write_pitch
-from agents.memory import remember
+import json
+from orchestrator.run_pipeline import pipeline_generator
 
-print("🚀 Starting UpvoteVC pipeline...\n")
+def main():
+    print("=== Testing Supervisor Multi-Agent Pipeline ===")
+    
+    # Simulate a user requesting research on an idea
+    mode = "research"
+    query = "A dashcam that automatically reports potholes to the city council"
+    
+    print(f"Request: Mode='{mode}', Query='{query}'\\n")
+    
+    for event in pipeline_generator(mode, query):
+        step = event.get("step")
+        msg = event.get("message", "")
+        
+        if step == "error":
+            print(f"\\n❌ [ERROR] {msg}")
+            break
+            
+        elif step == "complete":
+            print("\\n✅ [PIPELINE COMPLETE] Final Result:\\n")
+            result = event.get("result", {})
+            print(json.dumps(result, indent=2))
+            
+        else:
+            print(f"[{step.upper()}] {msg}")
 
-all_data = aggregate("Data centers", keyword="AI")
-posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
-
-if not posts:
-    print("❌ No posts found. Try a different city or keyword.")
-else:
-    pain = find_pain(posts)
-    analysis = analyze(pain, all_data)
-    ideas = generate_ideas(pain, analysis)
-    val_results = [validate(idea, pain) for idea in ideas]
-    pitch = write_pitch(pain, analysis, ideas, val_results, posts)
-    remember(pain, analysis, ideas)
-
-    print("\n" + "="*50)
-    print(pitch)
-    print("="*50)
+if __name__ == "__main__":
+    main()
