@@ -3,8 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Works locally (hardcoded) AND on Railway (env var)
-API_KEY = os.environ.get("HACKCLUB_API_KEY", "")
+# Works locally (hardcoded) AND on Railway/Vercel (env var)
+# We provide a dummy fallback so it doesn't crash on import if env vars aren't set yet on Vercel
+API_KEY = os.environ.get("HACKCLUB_API_KEY", "dummy_key_to_prevent_crash")
 
 from openai import OpenAI
 from core.retry import with_retry
