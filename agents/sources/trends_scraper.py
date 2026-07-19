@@ -1,6 +1,6 @@
 import requests
 
-HEADERS = {"User-Agent": "UpvoteVC/1.0"}
+HEADERS = {"User-Agent": "OpenVc/1.0"}
 
 def scrape_trends(city="Bangalore") -> list:
     print(f"[Trends] Fetching trending topics for {city}...")

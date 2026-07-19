@@ -42,8 +42,8 @@ export function PresentationPage() {
         <button className="pres-btn" onClick={() => navigate('/')}>Exit</button>
         <div className="pres-progress">
           {Array.from({ length: totalSlides }).map((_, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`pres-dot ${i === currentSlide ? 'active' : ''} ${i < currentSlide ? 'done' : ''}`}
               onClick={() => setCurrentSlide(i)}
             />
@@ -52,11 +52,11 @@ export function PresentationPage() {
       </div>
 
       <div className="presentation-slider" style={{ transform: `translateX(-${currentSlide * 100}vw)` }}>
-        
+
         {/* SLIDE 0: Intro */}
         <div className="pres-slide slide-intro">
           <div className="slide-content text-center">
-            <h4 className="pres-label">UpvoteVC</h4>
+            <h4 className="pres-label">OpenVc</h4>
             <h1 className="pres-title">Automated Venture Research.</h1>
             <div className="pres-highlight-block block-cream">
               <p className="pres-subtitle">Turning raw public frustration into structured opportunity.</p>
@@ -135,7 +135,7 @@ export function PresentationPage() {
         {/* SLIDE 5: Roadmap */}
         <div className="pres-slide slide-roadmap">
           <div className="slide-content">
-            <h2 className="pres-heading text-center" style={{color: 'white'}}>The Evolution</h2>
+            <h2 className="pres-heading text-center" style={{ color: 'white' }}>The Evolution</h2>
             <div className="pres-timeline">
               <div className="timeline-item past">
                 <div className="tl-phase">Phase 0</div>
@@ -164,9 +164,9 @@ export function PresentationPage() {
         {/* SLIDE 6: Why It Matters */}
         <div className="pres-slide slide-matters">
           <div className="slide-content text-center">
-            <div className="pres-highlight-block block-lime text-center" style={{padding: '5rem', borderRadius: '40px'}}>
+            <div className="pres-highlight-block block-lime text-center" style={{ padding: '5rem', borderRadius: '40px' }}>
               <h1 className="pres-title">Speed is a feature.</h1>
-              <p className="pres-subtitle">UpvoteVC helps founders move faster, replacing messy manual research with structured, actionable opportunity.</p>
+              <p className="pres-subtitle">OpenVc helps founders move faster, replacing messy manual research with structured, actionable opportunity.</p>
             </div>
           </div>
         </div>

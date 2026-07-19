@@ -19,7 +19,7 @@ export function LandingPage() {
             Research startup ideas like a venture fund.
           </h1>
           <p className="hero-subhead text-body-lg">
-            UpvoteVC is your AI venture research copilot. Discover real problems from public signals, validate your ideas, and generate investor-grade memos in minutes.
+            OpenVc is your AI venture research copilot. Discover real problems from public signals, validate your ideas, and generate investor-grade memos in minutes.
           </p>
           <div className="hero-actions">
             <Button variant="primary" onClick={() => navigate('/research')}>

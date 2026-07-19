@@ -6,12 +6,12 @@ import './Layout.css';
 export function TopNav() {
   return (
     <nav className="top-nav">
-      <Link to="/" className="top-nav-logo">UpvoteVC</Link>
-      
+      <Link to="/" className="top-nav-logo">OpenVc</Link>
+
       <div className="top-nav-links text-body-sm">
         <Link to="/discover" className="top-nav-link">Discover Ideas</Link>
         <Link to="/research" className="top-nav-link">Research My Idea</Link>
-        <Link to="/presentation" className="top-nav-link" style={{color: 'var(--color-primary)'}}>Pitch Deck</Link>
+        <Link to="/presentation" className="top-nav-link" style={{ color: 'var(--color-primary)' }}>Pitch Deck</Link>
       </div>
 
       <div className="top-nav-actions">
@@ -34,7 +34,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div>
-        <div className="footer-logo">UpvoteVC</div>
+        <div className="footer-logo">OpenVc</div>
       </div>
       <div className="footer-col">
         <div className="footer-col-title text-caption">Product</div>

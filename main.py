@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from orchestrator.run_pipeline import pipeline_generator
 
-app = FastAPI(title="UpvoteVC Supervisor API")
+app = FastAPI(title="OpenVc Supervisor API")
 
 app.add_middleware(
     CORSMiddleware,
