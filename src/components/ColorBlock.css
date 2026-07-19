@@ -1,0 +1,52 @@
+.color-block {
+  width: 100%;
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-xxl);
+  margin-bottom: var(--spacing-section);
+}
+
+@media (max-width: 768px) {
+  .color-block {
+    border-radius: 0;
+    margin-left: calc(-1 * var(--spacing-lg));
+    margin-right: calc(-1 * var(--spacing-lg));
+    width: calc(100% + 2 * var(--spacing-lg));
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+}
+
+.color-block-lime {
+  background-color: var(--color-block-lime);
+  color: var(--color-ink);
+}
+
+.color-block-lilac {
+  background-color: var(--color-block-lilac);
+  color: var(--color-ink);
+}
+
+.color-block-cream {
+  background-color: var(--color-block-cream);
+  color: var(--color-ink);
+}
+
+.color-block-pink {
+  background-color: var(--color-block-pink);
+  color: var(--color-ink);
+}
+
+.color-block-mint {
+  background-color: var(--color-block-mint);
+  color: var(--color-ink);
+}
+
+.color-block-coral {
+  background-color: var(--color-block-coral);
+  color: var(--color-ink);
+}
+
+.color-block-navy {
+  background-color: var(--color-block-navy);
+  color: var(--color-inverse-ink);
+}
