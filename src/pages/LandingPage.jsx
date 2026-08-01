@@ -16,44 +16,44 @@ export function LandingPage() {
       <div className="container">
         <section className="hero-section">
           <h1 className="hero-headline text-display-xl">
-            Research startup ideas like a venture fund.
+            AI-Powered Venture Intelligence for Early-Stage Sourcing & Diligence.
           </h1>
           <p className="hero-subhead text-body-lg">
-            OpenVc is your AI venture research copilot. Discover real problems from public signals, validate your ideas, and generate investor-grade memos in minutes.
+            OpenVC scans web signals, developer activity, and market momentum to help venture capital teams discover breakout startups, map emerging sectors, and build rigorous investment memos in minutes.
           </p>
           <div className="hero-actions">
             <Button variant="primary" onClick={() => navigate('/research')}>
-              Research My Idea
+              Run Sector Diligence
             </Button>
             <Button variant="secondary" onClick={() => navigate('/discover')}>
-              Discover Ideas
+              Source Market Signals
             </Button>
           </div>
         </section>
 
         <ColorBlock color="lime">
-          <div className="text-eyebrow" style={{ marginBottom: '24px' }}>Validate</div>
+          <div className="text-eyebrow" style={{ marginBottom: '24px' }}>Diligence & Sourcing</div>
           <div className="preview-section">
             <div className="preview-content">
               <h2 className="text-display-lg" style={{ marginBottom: '24px' }}>
-                Paste an idea. Get the founder memo.
+                Extract clear investment thesis from noisy web signals.
               </h2>
               <p className="text-subhead">
-                Stop guessing what the market wants. Our multi-agent pipeline aggregates Reddit complaints, News, and Trends to cross-validate your startup idea against real human frustration.
+                Eliminate manual market mapping. Our multi-agent intelligence engine aggregates signals across public discussions, news sentiment, and digital momentum to evaluate startup viability and market pull.
               </p>
             </div>
             <div className="preview-image">
               <div className="preview-mock">
                 <div className="text-eyebrow" style={{ color: 'var(--color-semantic-success)', marginBottom: '12px' }}>
-                  Verdict: GO
+                  Verdict: High Conviction (GO)
                 </div>
-                <h3 className="text-card-title" style={{ marginBottom: '16px' }}>SafeRide Monitor</h3>
+                <h3 className="text-card-title" style={{ marginBottom: '16px' }}>SafeRide Fleet Intelligence</h3>
                 <p className="text-body-sm" style={{ marginBottom: '16px' }}>
-                  <strong>Real Customer:</strong> Public school districts with $50–100M budgets prioritizing legal risk reduction.
+                  <strong>Target Market:</strong> Public school transit operations ($50–100M TAM) with increasing regulatory compliance pressures.
                 </p>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <CheckCircle2 size={16} color="var(--color-semantic-success)" />
-                  <span className="text-body-sm">Aligned with 35 Reddit signals</span>
+                  <span className="text-body-sm">Validated by 35 Public Market Signals</span>
                 </div>
               </div>
             </div>
@@ -61,25 +61,25 @@ export function LandingPage() {
         </ColorBlock>
 
         <ColorBlock color="lilac">
-          <div className="text-eyebrow" style={{ marginBottom: '24px' }}>How it works</div>
+          <div className="text-eyebrow" style={{ marginBottom: '24px' }}>Intelligence Pipeline</div>
           <h2 className="text-display-lg" style={{ marginBottom: '48px', maxWidth: '800px' }}>
-            A rigorous multi-agent pipeline working for you.
+            Autonomous multi-agent research built for investment teams.
           </h2>
           <div className="workflow-grid">
             <div className="workflow-card">
               <Search size={24} style={{ marginBottom: '16px' }} />
-              <h3 className="text-card-title" style={{ marginBottom: '8px' }}>1. Aggregate</h3>
-              <p className="text-body-sm">We mine Reddit, News, and Trends to find real pain points matching your idea.</p>
+              <h3 className="text-card-title" style={{ marginBottom: '8px' }}>1. Signal Sourcing</h3>
+              <p className="text-body-sm">Continuously tracks developer discussions, product complaints, and public digital exhaust to detect emerging inflection points.</p>
             </div>
             <div className="workflow-card">
               <Zap size={24} style={{ marginBottom: '16px' }} />
-              <h3 className="text-card-title" style={{ marginBottom: '8px' }}>2. Analyze</h3>
-              <p className="text-body-sm">Our AI digs into root causes, willingness to pay, and reasons why previous startups failed.</p>
+              <h3 className="text-card-title" style={{ marginBottom: '8px' }}>2. Deep Diligence</h3>
+              <p className="text-body-sm">Evaluates competitive moats, pricing power, customer acquisition channels, and past category failures.</p>
             </div>
             <div className="workflow-card">
               <ArrowRight size={24} style={{ marginBottom: '16px' }} />
-              <h3 className="text-card-title" style={{ marginBottom: '8px' }}>3. Pitch</h3>
-              <p className="text-body-sm">You receive a beautifully formatted investor-style memo with a Go / No-Go verdict.</p>
+              <h3 className="text-card-title" style={{ marginBottom: '8px' }}>3. Investment Memo</h3>
+              <p className="text-body-sm">Synthesizes structured diligence memos with risk vectors, market sizing indicators, and conviction scores.</p>
             </div>
           </div>
         </ColorBlock>

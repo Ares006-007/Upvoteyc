@@ -5,6 +5,7 @@ import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ReportPage } from './pages/ReportPage';
 import { PresentationPage } from './pages/PresentationPage';
+import { HistoryPage } from './pages/HistoryPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="discover" element={<DashboardPage />} />
           <Route path="research" element={<DashboardPage />} />
           <Route path="report" element={<ReportPage />} />
+          <Route path="history" element={<HistoryPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

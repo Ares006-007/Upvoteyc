@@ -83,18 +83,18 @@ export function DashboardPage() {
             className={`mode-toggle-btn text-button ${mode === 'discover' ? 'active' : ''}`}
             onClick={() => { setMode('discover'); setQuery(''); }}
           >
-            Discover Ideas
+            Market Signal Discovery
           </button>
           <button 
             className={`mode-toggle-btn text-button ${mode === 'research' ? 'active' : ''}`}
             onClick={() => { setMode('research'); setQuery(''); }}
           >
-            Research My Idea
+            Company & Thesis Diligence
           </button>
         </div>
         
         <h1 className="text-display-lg" style={{ marginBottom: '24px' }}>
-          {mode === 'discover' ? 'Find real problems.' : 'Validate your idea.'}
+          {mode === 'discover' ? 'Scan sector signals & momentum.' : 'Run company & thesis diligence.'}
         </h1>
       </div>
 
@@ -104,23 +104,23 @@ export function DashboardPage() {
           <input 
             type="text" 
             className="search-input" 
-            placeholder={mode === 'discover' ? "Enter an industry (e.g., healthcare, logistics)..." : "Describe your startup idea..."}
+            placeholder={mode === 'discover' ? "Enter a sector or theme (e.g., AI infrastructure, cold chain, agentic workflows)..." : "Enter company name, startup thesis, or problem domain..."}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             disabled={isSearching}
           />
           <div className="search-button">
             <Button variant="primary" onClick={handleSearch} disabled={isSearching}>
-              {isSearching ? 'Researching...' : 'Start'}
+              {isSearching ? 'Executing Diligence...' : 'Run Analysis'}
             </Button>
           </div>
         </div>
 
         {!isSearching && (
           <div className="filters-row text-body-sm">
+            <button className="filter-chip">Stage: Pre-Seed to Series A</button>
+            <button className="filter-chip">Signals: Communities, News, Repos</button>
             <button className="filter-chip">Geography: Global</button>
-            <button className="filter-chip">Customer: Any</button>
-            <button className="filter-chip">Sources: Reddit, News, Trends</button>
           </div>
         )}
       </div>
@@ -128,7 +128,7 @@ export function DashboardPage() {
       {(isSearching || logs.length > 0) && (
         <div className="progress-section">
           <div className="text-eyebrow" style={{ marginBottom: '24px', textAlign: 'center' }}>
-            Pipeline Active
+            Diligence Pipeline Active
           </div>
           
           {logs.map((log, index) => {

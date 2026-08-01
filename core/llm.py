@@ -18,15 +18,17 @@ client = OpenAI(
 
 MODEL = "qwen/qwen3-32b"
 
-def llm(prompt: str, system: str = "") -> str:
+def llm(prompt: str, system: str = "", model: str = None) -> str:
     """Basic text-to-text LLM call."""
+    if model is None:
+        model = MODEL
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
     try:
         response = client.chat.completions.create(
-            model=MODEL,
+            model=model,
             messages=messages,
             max_tokens=3000
         )
@@ -38,9 +40,9 @@ def llm(prompt: str, system: str = "") -> str:
         print(f"[LLM API Error] {e}")
         return ""
 
-def structured_llm(prompt: str, system: str, response_model):
+def structured_llm(prompt: str, system: str, response_model, model: str = None):
     """
     Calls the LLM and enforces the Pydantic response_model schema,
     using an automatic retry loop for JSON repair.
     """
-    return with_retry(llm, prompt, system, response_model)
+    return with_retry(llm, prompt, system, response_model, model=model)

@@ -6,17 +6,18 @@ import './Layout.css';
 export function TopNav() {
   return (
     <nav className="top-nav">
-      <Link to="/" className="top-nav-logo">OpenVc</Link>
+      <Link to="/" className="top-nav-logo">OpenVC</Link>
 
       <div className="top-nav-links text-body-sm">
-        <Link to="/discover" className="top-nav-link">Discover Ideas</Link>
-        <Link to="/research" className="top-nav-link">Research My Idea</Link>
-        <Link to="/presentation" className="top-nav-link" style={{ color: 'var(--color-primary)' }}>Pitch Deck</Link>
+        <Link to="/discover" className="top-nav-link">Market Signals</Link>
+        <Link to="/research" className="top-nav-link">Diligence Engine</Link>
+        <Link to="/history" className="top-nav-link">History</Link>
+        <Link to="/presentation" className="top-nav-link" style={{ color: 'var(--color-primary)' }}>Fund Deck</Link>
       </div>
 
       <div className="top-nav-actions">
-        <Button variant="secondary" onClick={() => window.location.href = '/research'}>Try for free</Button>
-        <Button variant="primary" onClick={() => window.location.href = '/discover'}>Explore Signals</Button>
+        <Button variant="secondary" onClick={() => window.location.href = '/research'}>Run Diligence</Button>
+        <Button variant="primary" onClick={() => window.location.href = '/discover'}>Source Signals</Button>
       </div>
     </nav>
   );
@@ -34,24 +35,25 @@ export function Footer() {
   return (
     <footer className="footer">
       <div>
-        <div className="footer-logo">OpenVc</div>
+        <div className="footer-logo">OpenVC</div>
       </div>
       <div className="footer-col">
-        <div className="footer-col-title text-caption">Product</div>
-        <Link to="/discover" className="footer-link text-body-sm">Discover</Link>
-        <Link to="/research" className="footer-link text-body-sm">Research</Link>
-        <Link to="#" className="footer-link text-body-sm">Pricing</Link>
+        <div className="footer-col-title text-caption">Platform</div>
+        <Link to="/discover" className="footer-link text-body-sm">Signal Sourcing</Link>
+        <Link to="/research" className="footer-link text-body-sm">Diligence Copilot</Link>
+        <Link to="/history" className="footer-link text-body-sm">Diligence Archive</Link>
+        <Link to="#" className="footer-link text-body-sm">Market Mapping</Link>
       </div>
       <div className="footer-col">
-        <div className="footer-col-title text-caption">Resources</div>
-        <Link to="#" className="footer-link text-body-sm">Blog</Link>
+        <div className="footer-col-title text-caption">Research</div>
         <Link to="#" className="footer-link text-body-sm">Methodology</Link>
-        <Link to="#" className="footer-link text-body-sm">Contact</Link>
+        <Link to="#" className="footer-link text-body-sm">Sector Reports</Link>
+        <Link to="#" className="footer-link text-body-sm">API & Data Access</Link>
       </div>
       <div className="footer-col">
-        <div className="footer-col-title text-caption">Legal</div>
-        <Link to="#" className="footer-link text-body-sm">Privacy</Link>
-        <Link to="#" className="footer-link text-body-sm">Terms</Link>
+        <div className="footer-col-title text-caption">Institutional</div>
+        <Link to="#" className="footer-link text-body-sm">Security & Compliance</Link>
+        <Link to="#" className="footer-link text-body-sm">Terms of Service</Link>
       </div>
     </footer>
   );

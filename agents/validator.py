@@ -24,4 +24,4 @@ Worker Outputs:
 
 Evaluate the data and output the ValidatedResearch JSON."""
 
-    return structured_llm(prompt, system, ValidatedResearch)
+    return structured_llm(prompt, system, ValidatedResearch, model="~x-ai/grok-latest")

@@ -10,9 +10,9 @@ class SearchQueries(BaseModel):
     keyword: str = Field(..., description="specific problem keyword (e.g., 'backlash', 'delays')")
 
 def extract_search_queries(user_idea: str) -> dict:
-    print("[Idea Refiner] Extracting search queries from idea...")
-    system = "You are a search query optimizer. Given a startup idea, extract the search topic and search keywords to find complaints/discussions about the problem this idea solves."
-    prompt = f"User's startup idea: {user_idea}"
+    print("[Signal Extractor] Extracting search queries from thesis/sector...")
+    system = "You are a venture research query optimizer. Given a startup thesis, company, or sector, extract the search topic and search keywords to find demand signals, market friction, and customer discussions."
+    prompt = f"Investment thesis / query: {user_idea}"
     res = structured_llm(prompt, system, SearchQueries)
     return res.model_dump() if res else {"topic": "startups", "keyword": "problem"}
 from agents.supervisor import run_supervisor
@@ -25,6 +25,7 @@ from agents.finance_worker import run_finance_worker
 from agents.visualization_worker import run_visualization_worker
 from agents.validator import run_validator
 from agents.reporter import run_reporter
+from core.history_store import save_history_item
 
 def pipeline_generator(req_mode: str, query: str):
     """
@@ -37,34 +38,34 @@ def pipeline_generator(req_mode: str, query: str):
         subreddit = "bangalore"
         keyword = query if not is_idea_research else None
         
-        yield {"step": "start", "message": "Starting multi-agent orchestration..."}
+        yield {"step": "start", "message": "Initializing autonomous multi-agent venture intelligence pipeline..."}
         
         if is_idea_research:
-            yield {"step": "aggregating", "message": "Extracting search queries..."}
+            yield {"step": "aggregating", "message": "Extracting market taxonomy and search queries..."}
             queries = extract_search_queries(user_idea)
             subreddit = queries.get("topic", "bangalore")
             keyword = queries.get("keyword")
             
-        yield {"step": "aggregating", "message": "Mining public signals across Reddit, News, and Trends..."}
+        yield {"step": "aggregating", "message": "Mining market signals across communities, news, and search trends..."}
         all_data = aggregate(subreddit, keyword=keyword)
         posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
         
         if not posts and keyword:
-            yield {"step": "aggregating", "message": "No signals found, retrying broad search..."}
+            yield {"step": "aggregating", "message": "Refining signal filters, retrying broader market search..."}
             all_data = aggregate(subreddit, keyword=None)
             posts = all_data.get("reddit", []) + all_data.get("news", []) + all_data.get("newsdata", []) + all_data.get("trends", [])
             
         if not posts:
-            yield {"step": "error", "message": "No signals found. Try describing your idea differently."}
+            yield {"step": "error", "message": "No market signals found. Try specifying a broader sector or alternative keywords."}
             return
             
         # Create a summary of posts to pass to agents (limit size)
-        posts_summary = "\\n".join(f"[{p.get('source_type', 'unknown')}] {p['title']}" for p in posts[:25])
+        posts_summary = "\n".join(f"[{p.get('source_type', 'unknown')}] {p['title']}" for p in posts[:25])
         
-        yield {"step": "supervisor", "message": f"Found {len(posts)} signals. Supervisor routing workers..."}
+        yield {"step": "supervisor", "message": f"Identified {len(posts)} market signals. Supervisor routing diligence workers..."}
         routing = run_supervisor(query, posts_summary)
         
-        yield {"step": "workers", "message": f"Dispatching core workers with focus: {', '.join(routing.focus_areas)}..."}
+        yield {"step": "workers", "message": f"Dispatching core research workers with priority on: {', '.join(routing.focus_areas)}..."}
         
         worker_outputs = {}
         
@@ -83,19 +84,19 @@ def pipeline_generator(req_mode: str, query: str):
             worker_outputs["founder_risk"] = future_risk.result().model_dump()
             
         if routing.requires_finance_worker:
-            yield {"step": "workers", "message": "Dispatching Finance Worker..."}
+            yield {"step": "workers", "message": "Dispatching Capital & Margin Worker..."}
             finance = run_finance_worker(query, posts_summary, routing.focus_areas)
             worker_outputs["finance"] = finance.model_dump()
             
         if routing.requires_visualization:
-            yield {"step": "workers", "message": "Dispatching Visualization Worker..."}
+            yield {"step": "workers", "message": "Dispatching Trend & Growth Visualization Worker..."}
             viz = run_visualization_worker(query, posts_summary, routing.focus_areas)
             worker_outputs["visualization"] = viz.model_dump()
             
-        yield {"step": "validator", "message": "Validator cross-checking worker outputs..."}
+        yield {"step": "validator", "message": "Validator stress-testing worker claims and resolving contradictions..."}
         validation = run_validator(query, json.dumps(worker_outputs))
         
-        yield {"step": "reporter", "message": "Reporter synthesizing final founder memo..."}
+        yield {"step": "reporter", "message": "Reporter synthesizing final investment memo..."}
         final_report = run_reporter(query, validation.model_dump_json(), json.dumps(worker_outputs))
         
         # Map the new structured output to the format expected by the frontend ReportPage.jsx
@@ -130,6 +131,14 @@ def pipeline_generator(req_mode: str, query: str):
             },
             "posts_count": len(posts)
         }
+        
+        # Persist to history for institutional review
+        try:
+            saved_item = save_history_item(query=query, mode=req_mode, report_data=frontend_payload)
+            frontend_payload["id"] = saved_item["id"]
+            frontend_payload["created_at"] = saved_item["created_at"]
+        except Exception as err:
+            print(f"[Pipeline] History save warning: {err}")
         
         yield {"step": "complete", "result": frontend_payload}
         

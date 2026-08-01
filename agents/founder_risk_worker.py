@@ -4,12 +4,12 @@ from typing import List
 
 def run_founder_risk_worker(query: str, posts_summary: str, focus_areas: List[str]) -> FounderRisk:
     """
-    Identifies specific execution risks.
+    Identifies specific execution, legal, and downside risks for venture investment diligence.
     """
-    print(f"[Founder Risk Worker] Identifying execution risks...")
+    print(f"[Investment Risk Worker] Identifying downside and execution risks...")
     
-    system = """You are the Founder Risk Worker. Your ONLY job is to identify the biggest reasons why this specific idea might fail during execution.
-Focus heavily on legal, regulatory, or technical hurdles.
+    system = """You are the Investment Risk Analyst Agent. Your ONLY job is to identify critical downside risks, execution bottlenecks, regulatory headwinds, and structural failure modes for this company or thesis.
+Focus heavily on market risk, defensibility, compliance hurdles, and technical operational friction.
 Always ground your claims in the provided evidence.
 """
 

@@ -12,7 +12,7 @@ def extract_json_from_text(text: str) -> str:
                 clean = clean[4:]
     return clean.strip()
 
-def with_retry(llm_func, prompt: str, system: str, response_model, max_retries: int = 3):
+def with_retry(llm_func, prompt: str, system: str, response_model, max_retries: int = 3, **kwargs):
     """
     Calls the LLM function and attempts to parse the output into the given Pydantic model.
     If it fails, it feeds the validation error back to the LLM to fix it.
@@ -25,7 +25,7 @@ def with_retry(llm_func, prompt: str, system: str, response_model, max_retries: 
     system_with_schema = f"{system}\n\nYou MUST return ONLY valid JSON that perfectly matches this JSON schema:\n{schema_json}"
     
     for attempt in range(max_retries):
-        raw_response = llm_func(current_prompt, system_with_schema)
+        raw_response = llm_func(current_prompt, system_with_schema, **kwargs)
         if not raw_response:
             continue
             
