@@ -1,9 +1,13 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from './Button';
+import { useAuth } from '../context/AuthContext';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import './Layout.css';
 
 export function TopNav() {
+  const { user, signOut } = useAuth();
+
   return (
     <nav className="top-nav">
       <Link to="/" className="top-nav-logo">OpenVC</Link>
@@ -17,7 +21,27 @@ export function TopNav() {
 
       <div className="top-nav-actions">
         <Button variant="secondary" onClick={() => window.location.href = '/research'}>Run Diligence</Button>
-        <Button variant="primary" onClick={() => window.location.href = '/discover'}>Source Signals</Button>
+        
+        {user ? (
+          <div className="user-profile-menu">
+            <div className="user-avatar-badge" title={user.email}>
+              <UserIcon size={14} />
+              <span className="user-email-text">{user.user_metadata?.full_name || user.email?.split('@')[0]}</span>
+            </div>
+            <button 
+              className="btn-signout" 
+              onClick={() => signOut()}
+              title="Sign Out"
+            >
+              <LogOut size={14} />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        ) : (
+          <Link to="/login" className="btn-signin-link text-button">
+            Sign In
+          </Link>
+        )}
       </div>
     </nav>
   );

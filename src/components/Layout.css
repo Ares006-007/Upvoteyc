@@ -37,6 +37,72 @@
   align-items: center;
 }
 
+.btn-signin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  background-color: var(--color-ink);
+  color: var(--color-inverse-ink);
+  border-radius: var(--rounded-pill);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.btn-signin-link:hover {
+  opacity: 0.85;
+}
+
+.user-profile-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-surface-soft);
+  padding: 4px 6px 4px 10px;
+  border-radius: var(--rounded-pill);
+  border: 1px solid var(--color-hairline);
+}
+
+.user-avatar-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.user-email-text {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-signout {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  color: #666;
+  border-radius: var(--rounded-pill);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-signout:hover {
+  background: #ffe8ed;
+  color: #d11149;
+  border-color: #ffd1dc;
+}
+
+
 .marquee-strip {
   background-color: var(--color-inverse-canvas);
   color: var(--color-inverse-ink);

@@ -1,8 +1,12 @@
 import json
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+load_dotenv()
 
 from orchestrator.run_pipeline import pipeline_generator
 from core.history_store import get_history_summary_list, get_history_item, delete_history_item
@@ -59,3 +63,72 @@ async def api_delete_history_item(item_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Diligence memorandum not found")
     return {"deleted": True, "id": item_id}
+
+
+@app.get("/api/health")
+async def api_health():
+    """
+    Healthcheck: verifies Supabase client and raw Postgres connectivity.
+    """
+    supabase_status = "error"
+    supabase_detail = ""
+    postgres_status = "error"
+    postgres_detail = ""
+
+    # --- Supabase client check (anon key) ---
+    try:
+        from core.supabase_client import supabase_public
+        if supabase_public is None:
+            supabase_detail = "Client not initialized — check SUPABASE_URL and SUPABASE_ANON_KEY in .env"
+        else:
+            # Use a simple RPC or raw PostgREST health ping
+            # supabase-py v2 exposes .table().select()
+            result = supabase_public.table("_health_check_dummy").select("*").limit(1).execute()
+            # If we get here without exception, the client connected successfully.
+            # A 404/empty result is fine — it means the API responded.
+            supabase_status = "ok"
+            supabase_detail = f"Supabase client responded (rows: {len(result.data)})"
+    except Exception as e:
+        err_msg = str(e)
+        # PostgREST errors like PGRST205 / 404 / "relation does not exist" still
+        # prove the client is wired correctly — the REST API responded.
+        ok_signals = ["404", "pgrst", "relation", "does not exist", "schema cache"]
+        if any(sig in err_msg.lower() for sig in ok_signals):
+            supabase_status = "ok"
+            supabase_detail = "Supabase client connected (table not found is expected — no tables yet)"
+        else:
+            supabase_detail = f"Supabase client error: {err_msg[:200]}"
+            print(f"[Health] Supabase error: {e}")
+
+    # --- Raw Postgres check (DATABASE_URL) ---
+    try:
+        import psycopg2
+        from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
+        database_url = os.getenv("DATABASE_URL", "")
+        if not database_url:
+            postgres_detail = "DATABASE_URL not set in .env"
+        else:
+            # Strip non-libpq query params (e.g. Supabase dashboard adds "projectName")
+            parsed = urlparse(database_url)
+            clean_params = {k: v for k, v in parse_qs(parsed.query).items()
+                           if k in ("sslmode", "connect_timeout", "application_name",
+                                    "options", "sslcert", "sslkey", "sslrootcert")}
+            clean_query = urlencode(clean_params, doseq=True)
+            clean_url = urlunparse(parsed._replace(query=clean_query))
+            conn = psycopg2.connect(clean_url)
+            cur = conn.cursor()
+            cur.execute("SELECT NOW()")
+            now = cur.fetchone()[0]
+            cur.close()
+            conn.close()
+            postgres_status = "ok"
+            postgres_detail = f"Postgres responded with server time: {now}"
+    except Exception as e:
+        postgres_detail = f"Postgres connection error: {str(e)[:200]}"
+        print(f"[Health] Postgres error: {e}")
+
+    return {
+        "supabaseClient": supabase_status,
+        "postgres": postgres_status,
+        "details": f"Supabase: {supabase_detail} | Postgres: {postgres_detail}"
+    }
