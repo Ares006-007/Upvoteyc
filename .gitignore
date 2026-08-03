@@ -1,13 +1,26 @@
-# Python
-venv/
+# ========================
+# Backend (Python / FastAPI)
+# ========================
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
 .env
 .env.local
-__pycache__/
-*.pyc
-memory.json
-scratch/
+backend/memory.json
+backend/scratch/
 
+# ========================
+# Frontend (React / Vite)
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# ========================
 # Logs
+# ========================
 logs
 *.log
 npm-debug.log*
@@ -16,12 +29,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
+# ========================
 # Editor directories and files
+# ========================
 .vscode/*
 !.vscode/extensions.json
 .idea

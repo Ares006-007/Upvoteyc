@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
+// Use explicit production URL so Supabase email links always point to Vercel,
+// even when the auth request is made from localhost during development.
+const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://openvc.vercel.app';
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -48,6 +52,7 @@ export function AuthProvider({ children }) {
         data: {
           full_name: fullName,
         },
+        emailRedirectTo: SITE_URL,
       },
     });
     if (error) throw error;
@@ -58,7 +63,7 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: SITE_URL,
       },
     });
     if (error) throw error;
@@ -67,7 +72,7 @@ export function AuthProvider({ children }) {
 
   const resetPassword = async (email) => {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login?mode=reset`,
+      redirectTo: `${SITE_URL}/login?mode=reset`,
     });
     if (error) throw error;
     return data;
