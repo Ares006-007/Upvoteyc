@@ -8,6 +8,7 @@ backend/**/__pycache__/
 .env
 .env.local
 backend/memory.json
+backend/feedback.json
 backend/scratch/
 
 # ========================
@@ -16,6 +17,7 @@ backend/scratch/
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
+frontend/tmp/
 *.local
 
 # ========================

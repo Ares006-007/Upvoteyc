@@ -10,6 +10,7 @@ load_dotenv()
 
 from orchestrator.run_pipeline import pipeline_generator
 from core.history_store import get_history_summary_list, get_history_item, delete_history_item
+from core.feedback_service import submit_feedback, get_all_feedbacks
 
 app = FastAPI(title="OpenVC Intelligence API")
 
@@ -24,6 +25,35 @@ app.add_middleware(
 class ResearchRequest(BaseModel):
     mode: str
     query: str
+
+class FeedbackRequest(BaseModel):
+    name: str = ""
+    email: str = ""
+    category: str = "General Feedback"
+    rating: int = 5
+    message: str
+    page_url: str = ""
+    metadata: dict = {}
+
+@app.post("/api/feedback")
+async def api_submit_feedback(req: FeedbackRequest):
+    """
+    Receives feedback from the UI and dispatches email directly to shaikajhaj@gmail.com,
+    stores in database/local fallback, and mirrors to Slack.
+    """
+    if not req.message.strip():
+        raise HTTPException(status_code=400, detail="Feedback message cannot be empty.")
+    
+    result = submit_feedback(req.dict())
+    return result
+
+@app.get("/api/feedback")
+async def api_get_feedbacks():
+    """
+    Returns stored feedback history.
+    """
+    return get_all_feedbacks()
+
 
 @app.post("/api/research")
 async def api_research(req: ResearchRequest):

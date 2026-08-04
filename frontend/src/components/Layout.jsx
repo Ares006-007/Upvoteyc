@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from './Button';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, MessageSquare } from 'lucide-react';
+import { FeedbackModal } from './FeedbackModal';
 import './Layout.css';
 
-export function TopNav() {
+export function TopNav({ onOpenFeedback }) {
   const { user, signOut } = useAuth();
 
   return (
@@ -16,6 +17,7 @@ export function TopNav() {
         <Link to="/discover" className="top-nav-link">Market Signals</Link>
         <Link to="/research" className="top-nav-link">Diligence Engine</Link>
         <Link to="/history" className="top-nav-link">History</Link>
+        <Link to="/feedback" className="top-nav-link">Feedback</Link>
         <Link to="/presentation" className="top-nav-link" style={{ color: 'var(--color-primary)' }}>Fund Deck</Link>
       </div>
 
@@ -55,18 +57,21 @@ export function MarqueeStrip({ text }) {
   );
 }
 
-export function Footer() {
+export function Footer({ onOpenFeedback }) {
   return (
     <footer className="footer">
       <div>
         <div className="footer-logo">OpenVC</div>
+        <p style={{ marginTop: '12px', fontSize: '13px', color: '#666' }}>
+          AI-Powered Venture Intelligence for Early-Stage Sourcing & Diligence.
+        </p>
       </div>
       <div className="footer-col">
         <div className="footer-col-title text-caption">Platform</div>
         <Link to="/discover" className="footer-link text-body-sm">Signal Sourcing</Link>
         <Link to="/research" className="footer-link text-body-sm">Diligence Copilot</Link>
         <Link to="/history" className="footer-link text-body-sm">Diligence Archive</Link>
-        <Link to="#" className="footer-link text-body-sm">Market Mapping</Link>
+        <Link to="/feedback" className="footer-link text-body-sm">Feedback & Requests</Link>
       </div>
       <div className="footer-col">
         <div className="footer-col-title text-caption">Research</div>
@@ -75,8 +80,15 @@ export function Footer() {
         <Link to="#" className="footer-link text-body-sm">API & Data Access</Link>
       </div>
       <div className="footer-col">
-        <div className="footer-col-title text-caption">Institutional</div>
-        <Link to="#" className="footer-link text-body-sm">Security & Compliance</Link>
+        <div className="footer-col-title text-caption">Direct Contact</div>
+        <button 
+          onClick={onOpenFeedback} 
+          style={{ background: 'none', border: 'none', textAlign: 'left', padding: 0, font: 'inherit', cursor: 'pointer' }}
+          className="footer-link text-body-sm"
+        >
+          Send Feedback (Direct)
+        </button>
+        <a href="mailto:shaikajhaj@gmail.com" className="footer-link text-body-sm">shaikajhaj@gmail.com</a>
         <Link to="#" className="footer-link text-body-sm">Terms of Service</Link>
       </div>
     </footer>
@@ -84,13 +96,34 @@ export function Footer() {
 }
 
 export function Layout() {
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+
   return (
     <div className="page-wrapper">
-      <TopNav />
+      <TopNav onOpenFeedback={() => setIsFeedbackOpen(true)} />
       <main>
-        <Outlet />
+        <Outlet context={{ openFeedback: () => setIsFeedbackOpen(true) }} />
       </main>
-      <Footer />
+      <Footer onOpenFeedback={() => setIsFeedbackOpen(true)} />
+
+      {/* Floating Feedback Trigger */}
+      <button 
+        className="floating-feedback-trigger"
+        onClick={() => setIsFeedbackOpen(true)}
+        title="Send feedback directly to shaikajhaj@gmail.com"
+        aria-label="Send Feedback"
+      >
+        <span className="pulse-dot"></span>
+        <MessageSquare size={15} />
+        <span>Feedback</span>
+      </button>
+
+      {/* Feedback Modal */}
+      <FeedbackModal 
+        isOpen={isFeedbackOpen} 
+        onClose={() => setIsFeedbackOpen(false)} 
+      />
     </div>
   );
 }
+

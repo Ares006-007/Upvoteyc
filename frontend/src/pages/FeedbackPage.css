@@ -1,0 +1,250 @@
+.feedback-page-container {
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+.feedback-page-nav-back {
+  margin-bottom: 24px;
+}
+
+.btn-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666666;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-back-link:hover {
+  background: #f0f0ec;
+  color: #000000;
+}
+
+.feedback-page-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.feedback-page-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-page-heading {
+  font-family: var(--font-sans, sans-serif);
+  font-size: 48px;
+  line-height: 1.1;
+  font-weight: 350;
+  letter-spacing: -1px;
+  color: var(--color-ink, #000000);
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.feedback-page-description {
+  color: #555555;
+  margin-bottom: 36px;
+  line-height: 1.5;
+}
+
+.feedback-guarantee-card {
+  background: #fafaf7;
+  border: 1px solid var(--color-hairline, #e6e6e6);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feedback-guarantee-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.feedback-guarantee-icon {
+  color: #ff3d8b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feedback-guarantee-item strong {
+  display: block;
+  font-size: 14px;
+  color: #111111;
+  margin-bottom: 3px;
+}
+
+.feedback-guarantee-item p {
+  font-size: 13px;
+  color: #666666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.feedback-guarantee-item code {
+  background: #ebebe7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: #111111;
+}
+
+/* Right Card */
+.feedback-page-form-wrapper {
+  position: relative;
+}
+
+.feedback-page-card {
+  background: #ffffff;
+  border: 1px solid var(--color-hairline, #e6e6e6);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.08);
+}
+
+.feedback-card-heading {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #000000;
+  margin-bottom: 6px;
+}
+
+.feedback-card-subheading {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 28px;
+}
+
+.feedback-page-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feedback-field-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #222222;
+  margin-bottom: 8px;
+}
+
+.feedback-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.feedback-category-tile {
+  background: #f7f7f5;
+  border: 1px solid #e4e4e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.feedback-category-tile:hover {
+  background: #ebebe7;
+  border-color: #cccccc;
+}
+
+.feedback-category-tile.selected {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cat-tile-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-tile-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.feedback-submit-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #f1f1ee;
+  margin-top: 8px;
+  gap: 16px;
+}
+
+.feedback-destination-badge {
+  font-size: 12px;
+  color: #666666;
+  display: flex;
+  align-items: center;
+}
+
+.feedback-destination-badge strong {
+  color: #111111;
+  margin-left: 3px;
+}
+
+.feedback-page-success {
+  padding: 40px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feedback-page-success h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.feedback-page-success p {
+  font-size: 15px;
+  color: #555555;
+  max-width: 440px;
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+.feedback-page-success-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .feedback-page-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .feedback-page-heading {
+    font-size: 36px;
+  }
+  .feedback-page-card {
+    padding: 24px;
+  }
+}
