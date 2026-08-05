@@ -1,5 +1,5 @@
 /* ========================================================
-   VantaCloudsBackground — Performance-First Architecture
+   VantaCloudsBackground — Stacking Context & Aesthetics
    ======================================================== */
 
 .vanta-hero-wrapper {
@@ -9,10 +9,10 @@
   overflow: hidden;
   box-sizing: border-box;
   isolation: isolate;
-  background-color: #7fa9c9;
+  background-color: #6cbede;
 }
 
-/* Instant CSS Static Dusk Fallback (0ms first paint, 0 JS cost) */
+/* Static CSS Dusk Gradient Fallback (Zero CLS, instant paint) */
 .vanta-static-fallback {
   position: absolute;
   inset: 0;
@@ -25,28 +25,27 @@
   pointer-events: none;
 }
 
-/* Background Canvas Layer — Dynamically loaded on capable clients */
+/* Dedicated WebGL Canvas Layer (z-index: 0) */
 .vanta-canvas-layer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.8s ease-out;
-}
-
-.vanta-canvas-layer.is-ready {
+  z-index: 0;
   opacity: 1;
 }
 
 .vanta-canvas-layer canvas {
   display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100% !important;
   height: 100% !important;
+  pointer-events: auto;
 }
 
-/* Subtle Contrast Overlay (z-10) */
+/* Subtle Contrast Overlay (z-index: 10) */
 .vanta-contrast-overlay {
   position: absolute;
   inset: 0;
@@ -56,7 +55,7 @@
   pointer-events: none;
 }
 
-/* Foreground Content (z-20) */
+/* Foreground Content (z-index: 20) */
 .vanta-foreground {
   position: relative;
   z-index: 20;
@@ -68,11 +67,4 @@
   align-items: center;
   padding: 80px 24px;
   box-sizing: border-box;
-}
-
-/* On mobile devices: eliminate any canvas render cost */
-@media (max-width: 768px) {
-  .vanta-canvas-layer {
-    display: none !important;
-  }
 }

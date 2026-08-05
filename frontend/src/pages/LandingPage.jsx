@@ -7,10 +7,11 @@ import { VantaCloudsBackground } from '../components/VantaCloudsBackground';
 import { ArrowRight, Search, Zap, CheckCircle2, Sparkles, Sliders, Sun } from 'lucide-react';
 import './LandingPage.css';
 
-// High-contrast, performance-tuned atmospheric sky presets
+// High-contrast, volumetric cloud themes
 const CLOUD_THEMES = {
   dusk: {
-    name: 'Cinematic Dusk (Optimized)',
+    name: 'Cinematic Dusk',
+    backgroundColor: 0x7fa9c9,
     skyColor: 0x6cbede,
     cloudColor: 0xb4c7e3,
     cloudShadowColor: 0x1a3956,
@@ -21,6 +22,7 @@ const CLOUD_THEMES = {
   },
   vivid: {
     name: 'Vivid Azure',
+    backgroundColor: 0x4a90c4,
     skyColor: 0x4faee0,
     cloudColor: 0xd9e6f2,
     cloudShadowColor: 0x10243a,
@@ -31,6 +33,7 @@ const CLOUD_THEMES = {
   },
   goldenHour: {
     name: 'Golden Sunset',
+    backgroundColor: 0x2c3e50,
     skyColor: 0x4a6984,
     cloudColor: 0xf8b195,
     cloudShadowColor: 0x0f1e2e,
@@ -41,6 +44,7 @@ const CLOUD_THEMES = {
   },
   twilight: {
     name: 'Deep Twilight',
+    backgroundColor: 0x1b263b,
     skyColor: 0x415a77,
     cloudColor: 0x8ea4bf,
     cloudShadowColor: 0x050d18,
@@ -61,9 +65,10 @@ export function LandingPage() {
     <>
       <MarqueeStrip text="" />
 
-      {/* Hero with production-safe, lag-free Vanta CLOUDS background */}
+      {/* Hero with Vanta CLOUDS 3D animated background */}
       <VantaCloudsBackground
         className="hero-vanta-container"
+        backgroundColor={activeTheme.backgroundColor}
         skyColor={activeTheme.skyColor}
         cloudColor={activeTheme.cloudColor}
         cloudShadowColor={activeTheme.cloudShadowColor}
