@@ -7,51 +7,51 @@ import { VantaCloudsBackground } from '../components/VantaCloudsBackground';
 import { ArrowRight, Search, Zap, CheckCircle2, Sparkles, Sliders, Sun } from 'lucide-react';
 import './LandingPage.css';
 
-// Preset color palettes for the Vanta CLOUDS background
+// High-contrast palettes — cloud/shadow separation is the key to visibility
 const CLOUD_THEMES = {
   dusk: {
-    name: 'Cinematic Dusk (Recommended)',
+    name: 'Cinematic Dusk',
     backgroundColor: 0x7fa9c9,
-    skyColor: 0x87b5d6,
-    cloudColor: 0xc7d2de,
-    cloudShadowColor: 0x6e7c8c,
-    sunColor: 0xf6a04d,
-    sunGlareColor: 0xffd2a6,
-    sunlightColor: 0xffb86b,
-    speed: 0.7,
+    skyColor: 0x6cbede,
+    cloudColor: 0xb4c7e3,
+    cloudShadowColor: 0x1a3956,
+    sunColor: 0xf49620,
+    sunGlareColor: 0xff6835,
+    sunlightColor: 0xf99632,
+    speed: 1.0,
+  },
+  vivid: {
+    name: 'Vivid Sky',
+    backgroundColor: 0x4a90c4,
+    skyColor: 0x4faee0,
+    cloudColor: 0xd9e6f2,
+    cloudShadowColor: 0x10243a,
+    sunColor: 0xffa033,
+    sunGlareColor: 0xffc27a,
+    sunlightColor: 0xffb347,
+    speed: 1.2,
   },
   goldenHour: {
     name: 'Golden Sunset',
     backgroundColor: 0x2c3e50,
     skyColor: 0x4a6984,
     cloudColor: 0xf8b195,
-    cloudShadowColor: 0x355c7d,
+    cloudShadowColor: 0x0f1e2e,
     sunColor: 0xff6f59,
     sunGlareColor: 0xffcc80,
     sunlightColor: 0xffaa5e,
-    speed: 0.6,
+    speed: 0.8,
   },
   twilight: {
     name: 'Deep Twilight',
     backgroundColor: 0x1b263b,
     skyColor: 0x415a77,
-    cloudColor: 0x778da9,
-    cloudShadowColor: 0x0d1b2a,
+    cloudColor: 0x8ea4bf,
+    cloudShadowColor: 0x050d18,
     sunColor: 0xe0a96d,
     sunGlareColor: 0xf5d6ba,
     sunlightColor: 0xcca47c,
-    speed: 0.5,
-  },
-  dawn: {
-    name: 'Morning Mist',
-    backgroundColor: 0xa8dadc,
-    skyColor: 0xc9e4de,
-    cloudColor: 0xf1faee,
-    cloudShadowColor: 0x90a4ae,
-    sunColor: 0xf4a261,
-    sunGlareColor: 0xffe8d6,
-    sunlightColor: 0xfed9b7,
-    speed: 0.8,
+    speed: 0.6,
   },
 };
 
@@ -65,7 +65,7 @@ export function LandingPage() {
     <>
       <MarqueeStrip text="" />
 
-      {/* Hero section with Vanta CLOUDS 3D Background */}
+      {/* Hero with Vanta CLOUDS 3D animated background */}
       <VantaCloudsBackground
         className="hero-vanta-container"
         backgroundColor={activeTheme.backgroundColor}
@@ -79,25 +79,27 @@ export function LandingPage() {
         mouseControls={true}
         touchControls={true}
         gyroControls={false}
-        minHeight={200.0}
-        minWidth={200.0}
-        scale={1.0}
-        scaleMobile={1.0}
+        minHeight={200}
+        minWidth={200}
+        scale={1}
+        scaleMobile={1}
         showOverlay={true}
-        overlayGradient="linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.65) 100%)"
+        overlayOpacity={0.05}
       >
-        <section className="hero-section hero-dusk-overlay">
-          {/* Glassmorphic Badge */}
+        <section className="hero-section">
+          {/* Glassmorphic badge */}
           <div className="hero-pill-badge">
             <Sparkles size={14} className="hero-badge-icon" />
             <span>Multi-Agent Venture Intelligence</span>
           </div>
 
           <h1 className="hero-headline text-display-xl hero-light-text">
-            AI-Powered Venture Intelligence for Early-Stage Sourcing & Diligence.
+            AI-Powered Venture Intelligence for Early-Stage Sourcing &amp; Diligence.
           </h1>
           <p className="hero-subhead text-body-lg hero-subhead-light">
-            OpenVC scans web signals, developer activity, and market momentum to help venture capital teams discover breakout startups, map emerging sectors, and build rigorous investment memos in minutes.
+            OpenVC scans web signals, developer activity, and market momentum to help
+            venture capital teams discover breakout startups, map emerging sectors, and
+            build rigorous investment memos in minutes.
           </p>
           <div className="hero-actions">
             <Button variant="primary" onClick={() => navigate('/research')}>
@@ -116,12 +118,12 @@ export function LandingPage() {
             </button>
           </div>
 
-          {/* Interactive Sky Theme Selector */}
+          {/* Theme selector */}
           {showTuner && (
             <div className="vanta-tuner-panel">
               <div className="vanta-tuner-header">
                 <Sun size={16} />
-                <span>Atmospheric Sky Presets</span>
+                <span>Atmospheric Presets</span>
               </div>
               <div className="vanta-theme-options">
                 {Object.entries(CLOUD_THEMES).map(([key, theme]) => (
@@ -148,7 +150,9 @@ export function LandingPage() {
                 Extract clear investment thesis from noisy web signals.
               </h2>
               <p className="text-subhead">
-                Eliminate manual market mapping. Our multi-agent intelligence engine aggregates signals across public discussions, news sentiment, and digital momentum to evaluate startup viability and market pull.
+                Eliminate manual market mapping. Our multi-agent intelligence engine
+                aggregates signals across public discussions, news sentiment, and digital
+                momentum to evaluate startup viability and market pull.
               </p>
             </div>
             <div className="preview-image">
@@ -158,7 +162,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-card-title" style={{ marginBottom: '16px' }}>SafeRide Fleet Intelligence</h3>
                 <p className="text-body-sm" style={{ marginBottom: '16px' }}>
-                  <strong>Target Market:</strong> Public school transit operations ($50–100M TAM) with increasing regulatory compliance pressures.
+                  <strong>Target Market:</strong> Public school transit operations ($50–100M TAM)
+                  with increasing regulatory compliance pressures.
                 </p>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <CheckCircle2 size={16} color="var(--color-semantic-success)" />
@@ -196,4 +201,5 @@ export function LandingPage() {
     </>
   );
 }
+
 export default LandingPage;

@@ -1,67 +1,72 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import CLOUDS from 'vanta/dist/vanta.clouds.min';
 import './VantaCloudsBackground.css';
 
 /**
  * VantaCloudsBackground
- * Production-ready animated 3D dusk sky hero background using Vanta CLOUDS with Three.js.
  * 
- * Features:
- * - Client-only initialization with Three.js explicit binding
- * - Configurable colors (sky, clouds, shadows, sun, glare, sunlight)
- * - Mouse & touch parallax interaction (gyro disabled)
- * - Safe lifecycle management with .destroy() on unmount (zero memory leaks)
- * - Respects 'prefers-reduced-motion'
- * - Graceful fallback base color without layout shift
- * - Optional customizable gradient contrast wash overlay
+ * Renders a full-viewport animated 3D sky using Vanta CLOUDS + Three.js.
+ * The canvas is mounted into a dedicated absolutely-positioned div that
+ * fills the hero wrapper. Foreground content sits in a separate z-20 container.
+ *
+ * Key fixes vs. previous implementation:
+ * - Canvas container uses z-index: 0 (not negative) to stay visible in stacking context
+ * - Canvas container keeps pointer-events so mouse parallax works
+ * - Resize observer calls effect.resize() when container dimensions change
+ * - Deferred initialization waits one frame to guarantee non-zero container size
+ * - Overlay is very subtle (5% black) — does NOT wash out the clouds
+ * - Default palette uses high tonal separation for visible cloud depth
  */
 export function VantaCloudsBackground({
   children,
   className = '',
   style = {},
-  // Vanta Color Palette (Cinematic Dusk Defaults)
+  // High-contrast cinematic dusk palette (clouds clearly visible)
   backgroundColor = 0x7fa9c9,
-  skyColor = 0x87b5d6,
-  cloudColor = 0xc7d2de,
-  cloudShadowColor = 0x6e7c8c,
-  sunColor = 0xf6a04d,
-  sunGlareColor = 0xffd2a6,
-  sunlightColor = 0xffb86b,
+  skyColor = 0x6cbede,
+  cloudColor = 0xb4c7e3,
+  cloudShadowColor = 0x1a3956,
+  sunColor = 0xf49620,
+  sunGlareColor = 0xff6835,
+  sunlightColor = 0xf99632,
   // Motion & Sizing
-  speed = 0.7,
+  speed = 1.0,
   mouseControls = true,
   touchControls = true,
   gyroControls = false,
-  minHeight = 200.0,
-  minWidth = 200.0,
-  scale = 1.0,
-  scaleMobile = 1.0,
-  // Overlay options
+  minHeight = 200,
+  minWidth = 200,
+  scale = 1,
+  scaleMobile = 1,
+  // Overlay — very subtle, must not wash out clouds
   showOverlay = true,
-  overlayGradient = 'linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%)',
-  overlayClassName = '',
+  overlayOpacity = 0.05,
 }) {
-  const vantaContainerRef = useRef(null);
-  const vantaEffectRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const containerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const effectRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    // Only execute on client
-    if (typeof window === 'undefined' || !vantaContainerRef.current) return;
+  // Memoized init function
+  const initEffect = useCallback(() => {
+    if (!canvasRef.current || effectRef.current) return;
 
-    // Ensure THREE is globally available if Vanta looks for window.THREE
+    const el = canvasRef.current;
+    // Vanta requires the target element to have real dimensions
+    if (el.offsetWidth === 0 || el.offsetHeight === 0) return;
+
     window.THREE = THREE;
 
-    // Check user preference for reduced motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const effectiveSpeed = prefersReducedMotion ? 0.05 : speed;
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     try {
       const initVanta = CLOUDS.default || CLOUDS;
       if (typeof initVanta === 'function') {
-        vantaEffectRef.current = initVanta({
-          el: vantaContainerRef.current,
+        effectRef.current = initVanta({
+          el,
           THREE,
           mouseControls,
           touchControls,
@@ -77,73 +82,84 @@ export function VantaCloudsBackground({
           sunColor,
           sunGlareColor,
           sunlightColor,
-          speed: effectiveSpeed,
+          speed: prefersReducedMotion ? 0.1 : speed,
         });
-        setIsLoaded(true);
+        setReady(true);
       }
     } catch (err) {
-      console.error('Failed to initialize Vanta CLOUDS effect:', err);
+      console.error('[VantaClouds] Init failed:', err);
     }
-
-    // Cleanup instance on unmount to avoid memory leaks
-    return () => {
-      if (vantaEffectRef.current && typeof vantaEffectRef.current.destroy === 'function') {
-        try {
-          vantaEffectRef.current.destroy();
-        } catch (e) {
-          console.warn('Error destroying Vanta instance:', e);
-        }
-        vantaEffectRef.current = null;
-      }
-    };
   }, [
-    backgroundColor,
-    skyColor,
-    cloudColor,
-    cloudShadowColor,
-    sunColor,
-    sunGlareColor,
-    sunlightColor,
-    speed,
-    mouseControls,
-    touchControls,
-    gyroControls,
-    minHeight,
-    minWidth,
-    scale,
-    scaleMobile,
+    backgroundColor, skyColor, cloudColor, cloudShadowColor,
+    sunColor, sunGlareColor, sunlightColor, speed,
+    mouseControls, touchControls, gyroControls,
+    minHeight, minWidth, scale, scaleMobile,
   ]);
 
-  // Convert hex color to CSS hex for fallback background
-  const hexBgColor = `#${backgroundColor.toString(16).padStart(6, '0')}`;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Wait one animation frame so the container has layout dimensions
+    const rafId = requestAnimationFrame(() => {
+      initEffect();
+    });
+
+    // Resize observer — call effect.resize() when container size changes
+    let resizeObserver;
+    if (canvasRef.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        if (effectRef.current && typeof effectRef.current.resize === 'function') {
+          effectRef.current.resize();
+        }
+      });
+      resizeObserver.observe(canvasRef.current);
+    }
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (resizeObserver) resizeObserver.disconnect();
+      if (effectRef.current && typeof effectRef.current.destroy === 'function') {
+        try {
+          effectRef.current.destroy();
+        } catch (e) {
+          console.warn('[VantaClouds] Destroy error:', e);
+        }
+        effectRef.current = null;
+      }
+    };
+  }, [initEffect]);
+
+  const hexBg = `#${backgroundColor.toString(16).padStart(6, '0')}`;
 
   return (
-    <div
+    <section
+      ref={containerRef}
       className={`vanta-hero-wrapper ${className}`}
-      style={{
-        backgroundColor: hexBgColor,
-        ...style,
-      }}
+      style={{ backgroundColor: hexBg, ...style }}
     >
-      {/* Absolute canvas background container */}
+      {/* z-0: Vanta canvas target — full-bleed, receives pointer events */}
       <div
-        ref={vantaContainerRef}
-        className={`vanta-canvas-container ${isLoaded ? 'is-loaded' : ''}`}
+        ref={canvasRef}
+        className={`vanta-canvas-layer ${ready ? 'is-ready' : ''}`}
         aria-hidden="true"
       />
 
-      {/* Optional contrast wash overlay */}
+      {/* z-10: Very subtle darkening overlay for text contrast (NOT heavy) */}
       {showOverlay && (
         <div
-          className={`vanta-overlay ${overlayClassName}`}
-          style={{ background: overlayGradient }}
+          className="vanta-contrast-overlay"
+          style={{ backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})` }}
           aria-hidden="true"
         />
       )}
 
-      {/* Hero Foreground Content */}
-      {children && <div className="vanta-content-container">{children}</div>}
-    </div>
+      {/* z-20: Foreground hero content */}
+      {children && (
+        <div className="vanta-foreground">
+          {children}
+        </div>
+      )}
+    </section>
   );
 }
 

@@ -1,58 +1,70 @@
-/* VantaCloudsBackground styles */
+/* ============================================
+   VantaCloudsBackground — Layout & Stacking
+   ============================================
+   DOM order:
+     .vanta-hero-wrapper     (relative, min-h-screen, overflow-hidden)
+       .vanta-canvas-layer   (absolute inset-0, z-index: 0)
+       .vanta-contrast-overlay (absolute inset-0, z-index: 10)
+       .vanta-foreground     (relative, z-index: 20)
+   ============================================ */
 
 .vanta-hero-wrapper {
   position: relative;
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   box-sizing: border-box;
+  /* Establish stacking context so z-index children work correctly */
+  isolation: isolate;
 }
 
-/* Background canvas container */
-.vanta-canvas-container {
+/* ---- Background Canvas Layer ---- */
+.vanta-canvas-layer {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
-  z-index: -10;
+  z-index: 0;
+  /* Start invisible, fade in when Vanta mounts */
   opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-  pointer-events: none;
+  transition: opacity 0.6s ease-out;
 }
 
-.vanta-canvas-container.is-loaded {
+.vanta-canvas-layer.is-ready {
   opacity: 1;
 }
 
-.vanta-canvas-container canvas {
+/* Ensure the Vanta-injected canvas fills its container */
+.vanta-canvas-layer canvas {
+  display: block;
   width: 100% !important;
   height: 100% !important;
-  display: block;
 }
 
-/* Optional Contrast Gradient Overlay */
-.vanta-overlay {
+/* ---- Subtle Contrast Overlay ---- */
+.vanta-contrast-overlay {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -5;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
   pointer-events: none;
-  backdrop-filter: blur(0px);
 }
 
-/* Foreground content wrapper */
-.vanta-content-container {
+/* ---- Foreground Content ---- */
+.vanta-foreground {
   position: relative;
-  z-index: 10;
+  z-index: 20;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 80px 24px;
+  box-sizing: border-box;
 }
