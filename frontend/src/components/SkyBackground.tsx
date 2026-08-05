@@ -1,6 +1,6 @@
+'use client';
+
 import React, { useEffect, useRef, useState, ReactNode, CSSProperties } from 'react';
-import * as THREE from 'three';
-import CLOUDS from 'vanta/dist/vanta.clouds.min';
 import './VantaCloudsBackground.css';
 
 export interface VantaCloudsOptions {
@@ -19,6 +19,7 @@ export interface VantaCloudsOptions {
   minWidth?: number;
   scale?: number;
   scaleMobile?: number;
+  disableOnMobile?: boolean;
 }
 
 export interface SkyBackgroundProps extends VantaCloudsOptions {
@@ -26,129 +27,149 @@ export interface SkyBackgroundProps extends VantaCloudsOptions {
   className?: string;
   style?: CSSProperties;
   showOverlay?: boolean;
-  overlayGradient?: string;
-  overlayClassName?: string;
+  overlayOpacity?: number;
 }
 
 /**
- * SkyBackground (TypeScript)
- * Cinematic animated dusk sky hero background powered by Vanta CLOUDS and Three.js.
+ * SkyBackground (Next.js & React Component)
+ * 
+ * Performance-tuned, client-only animated hero background using Vanta CLOUDS with Three.js.
+ * Safe for Next.js App Router / SSR, with dynamic lazy chunking and mobile fallback.
  */
 export const SkyBackground: React.FC<SkyBackgroundProps> = ({
   children,
   className = '',
   style = {},
-  // Cinematic Dusk Default Palette
+  // High-contrast dusk palette
   backgroundColor = 0x7fa9c9,
-  skyColor = 0x87b5d6,
-  cloudColor = 0xc7d2de,
-  cloudShadowColor = 0x6e7c8c,
-  sunColor = 0xf6a04d,
-  sunGlareColor = 0xffd2a6,
-  sunlightColor = 0xffb86b,
-  speed = 0.7,
-  mouseControls = true,
-  touchControls = true,
+  skyColor = 0x6cbede,
+  cloudColor = 0xb4c7e3,
+  cloudShadowColor = 0x1a3956,
+  sunColor = 0xf49620,
+  sunGlareColor = 0xff6835,
+  sunlightColor = 0xf99632,
+  // Aggressive performance settings
+  speed = 0.3,
+  mouseControls = false,
+  touchControls = false,
   gyroControls = false,
-  minHeight = 200.0,
-  minWidth = 200.0,
-  scale = 1.0,
-  scaleMobile = 1.0,
+  minHeight = 200,
+  minWidth = 200,
+  scale = 0.8,
+  scaleMobile = 0.55,
+  disableOnMobile = true,
   showOverlay = true,
-  overlayGradient = 'linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.45) 100%)',
-  overlayClassName = '',
+  overlayOpacity = 0.05,
 }) => {
-  const vantaRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const effectRef = useRef<any>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isVantaActive, setIsVantaActive] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !vantaRef.current) return;
+    if (typeof window === 'undefined' || !canvasRef.current) return;
 
-    // Attach THREE to window for Vanta bundle compatibility
-    (window as any).THREE = THREE;
-
-    // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const activeSpeed = prefersReducedMotion ? 0.05 : speed;
+    const isMobile = disableOnMobile && (window.innerWidth < 768 || window.matchMedia('(max-width: 768px)').matches);
 
-    try {
-      const initVanta = (CLOUDS as any).default || CLOUDS;
-      if (typeof initVanta === 'function') {
-        effectRef.current = initVanta({
-          el: vantaRef.current,
-          THREE,
-          backgroundColor,
-          skyColor,
-          cloudColor,
-          cloudShadowColor,
-          sunColor,
-          sunGlareColor,
-          sunlightColor,
-          speed: activeSpeed,
-          mouseControls,
-          touchControls,
-          gyroControls,
-          minHeight,
-          minWidth,
-          scale,
-          scaleMobile,
-        });
-        setIsMounted(true);
-      }
-    } catch (error) {
-      console.error('SkyBackground initialization failed:', error);
+    if (prefersReducedMotion || isMobile) {
+      return;
     }
 
-    // Teardown / memory cleanup
-    return () => {
-      if (effectRef.current && typeof effectRef.current.destroy === 'function') {
-        try {
-          effectRef.current.destroy();
-        } catch (err) {
-          console.warn('SkyBackground destroy error:', err);
+    let isSubscribed = true;
+
+    const loadEffect = async () => {
+      try {
+        const [THREE, vantaModule] = await Promise.all([
+          import('three'),
+          import('vanta/dist/vanta.clouds.min')
+        ]);
+
+        if (!isSubscribed || !canvasRef.current || effectRef.current) return;
+
+        (window as any).THREE = THREE;
+        const initVanta = (vantaModule as any).default || vantaModule;
+
+        if (typeof initVanta === 'function') {
+          effectRef.current = initVanta({
+            el: canvasRef.current,
+            THREE,
+            mouseControls,
+            touchControls,
+            gyroControls,
+            minHeight,
+            minWidth,
+            scale,
+            scaleMobile,
+            backgroundColor,
+            skyColor,
+            cloudColor,
+            cloudShadowColor,
+            sunColor,
+            sunGlareColor,
+            sunlightColor,
+            speed,
+          });
+
+          if (isSubscribed) {
+            setIsVantaActive(true);
+          }
         }
-        effectRef.current = null;
+      } catch (err) {
+        console.warn('[SkyBackground] Dynamic WebGL initialization skipped:', err);
       }
     };
-  }, [
-    backgroundColor,
-    skyColor,
-    cloudColor,
-    cloudShadowColor,
-    sunColor,
-    sunGlareColor,
-    sunlightColor,
-    speed,
-    mouseControls,
-    touchControls,
-    gyroControls,
-    minHeight,
-    minWidth,
-    scale,
-    scaleMobile,
-  ]);
 
-  const fallbackColor = `#${backgroundColor.toString(16).padStart(6, '0')}`;
+    if ('requestIdleCallback' in window) {
+      const idleId = (window as any).requestIdleCallback(() => {
+        loadEffect();
+      }, { timeout: 1000 });
+      return () => {
+        isSubscribed = false;
+        (window as any).cancelIdleCallback(idleId);
+        if (effectRef.current && typeof effectRef.current.destroy === 'function') {
+          effectRef.current.destroy();
+          effectRef.current = null;
+        }
+      };
+    } else {
+      const timer = setTimeout(loadEffect, 50);
+      return () => {
+        isSubscribed = false;
+        clearTimeout(timer);
+        if (effectRef.current && typeof effectRef.current.destroy === 'function') {
+          effectRef.current.destroy();
+          effectRef.current = null;
+        }
+      };
+    }
+  }, [
+    backgroundColor, skyColor, cloudColor, cloudShadowColor,
+    sunColor, sunGlareColor, sunlightColor, speed,
+    mouseControls, touchControls, gyroControls,
+    minHeight, minWidth, scale, scaleMobile, disableOnMobile
+  ]);
 
   return (
     <section
+      ref={containerRef}
       className={`vanta-hero-wrapper ${className}`}
-      style={{ backgroundColor: fallbackColor, ...style }}
+      style={style}
     >
+      <div className="vanta-static-fallback" aria-hidden="true" />
       <div
-        ref={vantaRef}
-        className={`vanta-canvas-container ${isMounted ? 'is-loaded' : ''}`}
+        ref={canvasRef}
+        className={`vanta-canvas-layer ${isVantaActive ? 'is-ready' : ''}`}
         aria-hidden="true"
       />
       {showOverlay && (
         <div
-          className={`vanta-overlay ${overlayClassName}`}
-          style={{ background: overlayGradient }}
+          className="vanta-contrast-overlay"
+          style={{ backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})` }}
           aria-hidden="true"
         />
       )}
-      {children && <div className="vanta-content-container">{children}</div>}
+      {children && <div className="vanta-foreground">{children}</div>}
     </section>
   );
 };
