@@ -7,51 +7,47 @@ import { VantaCloudsBackground } from '../components/VantaCloudsBackground';
 import { ArrowRight, Search, Zap, CheckCircle2, Sparkles, Sliders, Sun } from 'lucide-react';
 import './LandingPage.css';
 
-// High-contrast palettes — cloud/shadow separation is the key to visibility
+// High-contrast, performance-tuned atmospheric sky presets
 const CLOUD_THEMES = {
   dusk: {
-    name: 'Cinematic Dusk',
-    backgroundColor: 0x7fa9c9,
+    name: 'Cinematic Dusk (Optimized)',
     skyColor: 0x6cbede,
     cloudColor: 0xb4c7e3,
     cloudShadowColor: 0x1a3956,
     sunColor: 0xf49620,
     sunGlareColor: 0xff6835,
     sunlightColor: 0xf99632,
-    speed: 1.0,
+    speed: 0.28,
   },
   vivid: {
-    name: 'Vivid Sky',
-    backgroundColor: 0x4a90c4,
+    name: 'Vivid Azure',
     skyColor: 0x4faee0,
     cloudColor: 0xd9e6f2,
     cloudShadowColor: 0x10243a,
     sunColor: 0xffa033,
     sunGlareColor: 0xffc27a,
     sunlightColor: 0xffb347,
-    speed: 1.2,
+    speed: 0.32,
   },
   goldenHour: {
     name: 'Golden Sunset',
-    backgroundColor: 0x2c3e50,
     skyColor: 0x4a6984,
     cloudColor: 0xf8b195,
     cloudShadowColor: 0x0f1e2e,
     sunColor: 0xff6f59,
     sunGlareColor: 0xffcc80,
     sunlightColor: 0xffaa5e,
-    speed: 0.8,
+    speed: 0.26,
   },
   twilight: {
     name: 'Deep Twilight',
-    backgroundColor: 0x1b263b,
     skyColor: 0x415a77,
     cloudColor: 0x8ea4bf,
     cloudShadowColor: 0x050d18,
     sunColor: 0xe0a96d,
     sunGlareColor: 0xf5d6ba,
     sunlightColor: 0xcca47c,
-    speed: 0.6,
+    speed: 0.24,
   },
 };
 
@@ -65,10 +61,9 @@ export function LandingPage() {
     <>
       <MarqueeStrip text="" />
 
-      {/* Hero with Vanta CLOUDS 3D animated background */}
+      {/* Hero with production-safe, lag-free Vanta CLOUDS background */}
       <VantaCloudsBackground
         className="hero-vanta-container"
-        backgroundColor={activeTheme.backgroundColor}
         skyColor={activeTheme.skyColor}
         cloudColor={activeTheme.cloudColor}
         cloudShadowColor={activeTheme.cloudShadowColor}
@@ -76,13 +71,13 @@ export function LandingPage() {
         sunGlareColor={activeTheme.sunGlareColor}
         sunlightColor={activeTheme.sunlightColor}
         speed={activeTheme.speed}
-        mouseControls={true}
-        touchControls={true}
+        mouseControls={false}
+        touchControls={false}
         gyroControls={false}
         minHeight={200}
         minWidth={200}
-        scale={1}
-        scaleMobile={1}
+        scale={0.8}
+        scaleMobile={0.5}
         showOverlay={true}
         overlayOpacity={0.05}
       >

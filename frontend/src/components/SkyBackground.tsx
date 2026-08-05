@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, ReactNode, CSSProperties } from 'react';
+import React, { useEffect, useRef, useState, useCallback, ReactNode, CSSProperties } from 'react';
 import './VantaCloudsBackground.css';
 
 export interface VantaCloudsOptions {
@@ -33,122 +33,155 @@ export interface SkyBackgroundProps extends VantaCloudsOptions {
 /**
  * SkyBackground (Next.js & React Component)
  * 
- * Performance-tuned, client-only animated hero background using Vanta CLOUDS with Three.js.
- * Safe for Next.js App Router / SSR, with dynamic lazy chunking and mobile fallback.
+ * Smooth, production-safe animated hero background using Vanta CLOUDS and Three.js.
+ * Pauses automatically when offscreen (IntersectionObserver) or when the tab is inactive.
  */
 export const SkyBackground: React.FC<SkyBackgroundProps> = ({
   children,
   className = '',
   style = {},
-  // High-contrast dusk palette
-  backgroundColor = 0x7fa9c9,
+  // Visual Palette
   skyColor = 0x6cbede,
   cloudColor = 0xb4c7e3,
   cloudShadowColor = 0x1a3956,
   sunColor = 0xf49620,
   sunGlareColor = 0xff6835,
   sunlightColor = 0xf99632,
-  // Aggressive performance settings
-  speed = 0.3,
+  // Optimized Motion & Sizing
+  speed = 0.28,
   mouseControls = false,
   touchControls = false,
   gyroControls = false,
   minHeight = 200,
   minWidth = 200,
   scale = 0.8,
-  scaleMobile = 0.55,
-  disableOnMobile = true,
+  scaleMobile = 0.5,
+  disableOnMobile = false,
   showOverlay = true,
   overlayOpacity = 0.05,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const effectRef = useRef<any>(null);
-  const [isVantaActive, setIsVantaActive] = useState(false);
+  const isVisibleRef = useRef<boolean>(true);
+  const [isVantaActive, setIsVantaActive] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !canvasRef.current) return;
+  const destroyVanta = useCallback(() => {
+    if (effectRef.current && typeof effectRef.current.destroy === 'function') {
+      try {
+        effectRef.current.destroy();
+      } catch (err) {
+        console.warn('[SkyBackground] Destruction notice:', err);
+      }
+      effectRef.current = null;
+      setIsVantaActive(false);
+    }
+  }, []);
+
+  const initVanta = useCallback(async () => {
+    if (!canvasRef.current || effectRef.current || !isVisibleRef.current) return;
+    if (typeof window === 'undefined') return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     const isMobile = disableOnMobile && (window.innerWidth < 768 || window.matchMedia('(max-width: 768px)').matches);
+    if (isMobile) return;
 
-    if (prefersReducedMotion || isMobile) {
-      return;
-    }
+    try {
+      const [THREE, vantaModule] = await Promise.all([
+        import('three'),
+        import('vanta/dist/vanta.clouds.min')
+      ]);
 
-    let isSubscribed = true;
+      if (!canvasRef.current || effectRef.current || !isVisibleRef.current) return;
 
-    const loadEffect = async () => {
-      try {
-        const [THREE, vantaModule] = await Promise.all([
-          import('three'),
-          import('vanta/dist/vanta.clouds.min')
-        ]);
+      (window as any).THREE = THREE;
+      const cloudsFn = (vantaModule as any).default || vantaModule;
 
-        if (!isSubscribed || !canvasRef.current || effectRef.current) return;
+      if (typeof cloudsFn === 'function') {
+        effectRef.current = cloudsFn({
+          el: canvasRef.current,
+          THREE,
+          mouseControls,
+          touchControls,
+          gyroControls,
+          minHeight,
+          minWidth,
+          scale,
+          scaleMobile,
+          skyColor,
+          cloudColor,
+          cloudShadowColor,
+          sunColor,
+          sunGlareColor,
+          sunlightColor,
+          speed,
+        });
 
-        (window as any).THREE = THREE;
-        const initVanta = (vantaModule as any).default || vantaModule;
-
-        if (typeof initVanta === 'function') {
-          effectRef.current = initVanta({
-            el: canvasRef.current,
-            THREE,
-            mouseControls,
-            touchControls,
-            gyroControls,
-            minHeight,
-            minWidth,
-            scale,
-            scaleMobile,
-            backgroundColor,
-            skyColor,
-            cloudColor,
-            cloudShadowColor,
-            sunColor,
-            sunGlareColor,
-            sunlightColor,
-            speed,
-          });
-
-          if (isSubscribed) {
-            setIsVantaActive(true);
-          }
-        }
-      } catch (err) {
-        console.warn('[SkyBackground] Dynamic WebGL initialization skipped:', err);
+        setIsVantaActive(true);
       }
-    };
-
-    if ('requestIdleCallback' in window) {
-      const idleId = (window as any).requestIdleCallback(() => {
-        loadEffect();
-      }, { timeout: 1000 });
-      return () => {
-        isSubscribed = false;
-        (window as any).cancelIdleCallback(idleId);
-        if (effectRef.current && typeof effectRef.current.destroy === 'function') {
-          effectRef.current.destroy();
-          effectRef.current = null;
-        }
-      };
-    } else {
-      const timer = setTimeout(loadEffect, 50);
-      return () => {
-        isSubscribed = false;
-        clearTimeout(timer);
-        if (effectRef.current && typeof effectRef.current.destroy === 'function') {
-          effectRef.current.destroy();
-          effectRef.current = null;
-        }
-      };
+    } catch (err) {
+      console.warn('[SkyBackground] WebGL fallback active:', err);
     }
   }, [
-    backgroundColor, skyColor, cloudColor, cloudShadowColor,
-    sunColor, sunGlareColor, sunlightColor, speed,
-    mouseControls, touchControls, gyroControls,
+    skyColor, cloudColor, cloudShadowColor,
+    sunColor, sunGlareColor, sunlightColor,
+    speed, mouseControls, touchControls, gyroControls,
     minHeight, minWidth, scale, scaleMobile, disableOnMobile
   ]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !containerRef.current) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isVisibleRef.current = false;
+        destroyVanta();
+      } else {
+        isVisibleRef.current = true;
+        initVanta();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    let observer: IntersectionObserver | undefined;
+    if ('IntersectionObserver' in window && containerRef.current) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (entry.isIntersecting && !document.hidden) {
+            isVisibleRef.current = true;
+            initVanta();
+          } else {
+            isVisibleRef.current = false;
+            destroyVanta();
+          }
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(containerRef.current);
+    } else {
+      initVanta();
+    }
+
+    let resizeObserver: ResizeObserver | undefined;
+    if (canvasRef.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        if (effectRef.current && typeof effectRef.current.resize === 'function') {
+          effectRef.current.resize();
+        }
+      });
+      resizeObserver.observe(canvasRef.current);
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (observer) observer.disconnect();
+      if (resizeObserver) resizeObserver.disconnect();
+      destroyVanta();
+    };
+  }, [initVanta, destroyVanta]);
 
   return (
     <section
