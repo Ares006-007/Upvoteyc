@@ -2,8 +2,11 @@
   "name": "openvc",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
-    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build && node -e \"const fs=require('fs'); try{fs.cpSync('frontend/dist', 'dist', {recursive:true});}catch(e){}\"",
     "dev": "npm --prefix frontend run dev",
     "lint": "npm --prefix frontend run lint"
   }
