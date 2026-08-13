@@ -1,12 +1,11 @@
 # ========================
 # Backend (Python / FastAPI)
 # ========================
-backend/venv/
-backend/__pycache__/
-backend/**/__pycache__/
+__pycache__/
 *.pyc
 .env
 .env.local
+backend/venv/
 backend/memory.json
 backend/feedback.json
 backend/scratch/

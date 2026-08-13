@@ -5,11 +5,12 @@ import sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
 
-# Add backend directory to sys.path
+# Add backend directory and root directory to sys.path
 backend_dirs = [
     os.path.join(root_dir, "backend"),
     os.path.join(current_dir, "backend"),
     os.path.abspath("backend"),
+    root_dir,
 ]
 
 for b_dir in backend_dirs:
@@ -17,6 +18,7 @@ for b_dir in backend_dirs:
         sys.path.insert(0, b_dir)
 
 try:
-    from main import app
-except ImportError:
     from backend.main import app
+except ImportError:
+    from main import app  # type: ignore
+

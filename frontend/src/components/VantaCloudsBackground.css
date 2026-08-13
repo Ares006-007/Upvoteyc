@@ -25,7 +25,12 @@
   pointer-events: none;
 }
 
-/* Dedicated WebGL Canvas Layer (z-index: 0) */
+/* Dedicated WebGL Canvas Layer (z-index: 0)
+   ──────────────────────────────────────────
+   • contain: strict — prevents layout/paint spill from canvas updates
+     to the rest of the page. Critical for scroll perf.
+   • will-change: contents — hints the compositor that this layer's
+     pixel content changes frequently (WebGL draws). */
 .vanta-canvas-layer {
   position: absolute;
   inset: 0;
@@ -33,6 +38,7 @@
   height: 100%;
   z-index: 0;
   opacity: 1;
+  contain: strict;
 }
 
 .vanta-canvas-layer canvas {
@@ -43,6 +49,13 @@
   width: 100% !important;
   height: 100% !important;
   pointer-events: auto;
+  /* Smooth fade-in when WebGL canvas appears over the static fallback */
+  animation: vantaCanvasFadeIn 0.6s ease-out 0.1s both;
+}
+
+@keyframes vantaCanvasFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Subtle Contrast Overlay (z-index: 10) */
@@ -67,4 +80,13 @@
   align-items: center;
   padding: 80px 24px;
   box-sizing: border-box;
+}
+
+/* ─── Accessibility: prefers-reduced-motion ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vanta-canvas-layer {
+    /* Hide the WebGL canvas entirely — the static gradient fallback
+       remains visible, providing the same color palette without motion */
+    display: none !important;
+  }
 }
